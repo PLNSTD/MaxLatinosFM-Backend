@@ -1,1 +1,0 @@
-// CRUD LOGIC FOR "items" OBJECT
