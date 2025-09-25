@@ -1,4 +1,5 @@
 // CRUD LOGIC FOR "items" OBJECT
+import path from "path";
 import type { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 
@@ -18,9 +19,22 @@ export const getSongById = async (req: Request, res: Response) => {
   res.json(song);
 };
 
+export const getSongAudioById = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const song = await prisma.song.findUnique({ where: { id: Number(id) } });
+
+  if (!song) return res.status(404).send("Song not found");
+
+  res.header("Content-Type", "audio/mpeg");
+  console.log("Sending" + path.resolve(song.path));
+  res.sendFile(path.resolve(song.path));
+};
+
 export const createSong = async (req: Request, res: Response) => {
-  const { title, artist, duration } = req.body;
-  const song = await prisma.song.create({ data: { title, artist, duration } });
+  const { title, artist, duration, path } = req.body;
+  const song = await prisma.song.create({
+    data: { title, artist, duration, path },
+  });
   res.status(201).json(song);
 };
 

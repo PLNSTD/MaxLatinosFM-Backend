@@ -6,6 +6,7 @@ import {
   createSong,
   updateSong,
   deleteSong,
+  getSongAudioById,
 } from "../controllers/songController.js";
 
 export const songRouter = Router();
@@ -15,6 +16,9 @@ songRouter.get("/", getAllSongs);
 
 // GET /api/songs/:id -> get a song by ID
 songRouter.get("/:id", getSongById);
+
+// GET /api/songs/:id/audio -> get a song audio by ID
+songRouter.get("/:id/audio", getSongAudioById);
 
 // POST /api/songs -> add a song by ID
 songRouter.post("/", createSong);
