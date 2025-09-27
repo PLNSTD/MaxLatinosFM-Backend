@@ -5,7 +5,11 @@ import { songRouter } from "./routes/songRouter.js";
 
 const app = express();
 
-const allowedOrigins = ["maxlatinosfm.com"];
+const allowedOrigins = [
+  "maxlatinosfm.com",
+  "https://max-latinos-fm-plidhers-projects.vercel.app",
+  "http://localhost:3000",
+];
 
 // Allow requests from frontend
 app.use(
