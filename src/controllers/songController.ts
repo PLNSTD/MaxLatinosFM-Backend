@@ -40,10 +40,10 @@ export const createSong = async (req: Request, res: Response) => {
 
 export const updateSong = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { title, artist } = req.body;
+  const { title, artist, path, duration } = req.body;
   const song = await prisma.song.update({
     where: { id: Number(id) },
-    data: { title, artist },
+    data: { title, artist, path, duration },
   });
   res.json(song);
 };
