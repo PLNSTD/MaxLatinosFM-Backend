@@ -6,7 +6,7 @@ import { songRouter } from "./routes/songRouter.js";
 const app = express();
 
 const allowedOrigins = [
-  "maxlatinosfm.com",
+  "https://maxlatinosfm.com",
   "https://max-latinos-fm-plidhers-projects.vercel.app",
   "http://localhost:3000",
 ];
