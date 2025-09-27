@@ -8,7 +8,7 @@ const app = express();
 // Allow requests from frontend
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://maxlatinosfm.com"],
   })
 );
 
