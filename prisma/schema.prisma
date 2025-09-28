@@ -14,13 +14,13 @@ datasource db {
 }
 
 model Song {
-  id        Int      @id @default(autoincrement())
-  title     String
-  artist    String
-  duration  Int
-  path      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  
+  id          Int      @id @default(autoincrement())
+  title       String
+  artist      String
+  duration    Int
+  path        String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  storage_id  String
   @@map("songs")
 }

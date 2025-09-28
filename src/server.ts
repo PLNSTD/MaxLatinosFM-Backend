@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 async function boostrap() {
   await radioQueue.init();
-  setInterval(() => radioQueue.tick(), 5000); // check every 5s
+  setInterval(() => radioQueue.tick(), 1000); // check every 1s
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

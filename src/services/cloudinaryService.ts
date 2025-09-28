@@ -25,6 +25,10 @@ export const uploadSongToCloudinary = async (file: Express.Multer.File) => {
     };
   }
 };
+
+export const deleteSongFromCloudinary = async (storage_id: String) => {
+  await cloudinary.uploader.destroy(storage_id);
+};
 // app.post("/upload", upload.single("song"), async (req, res) => {
 //   try {
 //     const result = await cloudinary.uploader.upload(req.file!.path, {
