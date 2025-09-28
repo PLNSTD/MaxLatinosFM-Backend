@@ -6,7 +6,11 @@ import {
   deleteSongFromCloudinary,
   uploadSongToCloudinary,
 } from "../services/cloudinaryService.js";
-import { durationToSeconds, getAudioDuration } from "./utilities.js";
+import {
+  capitalizeWords,
+  durationToSeconds,
+  getAudioDuration,
+} from "./utilities.js";
 import { radioQueue } from "../services/RadioManager.js";
 
 const prisma = radioQueue.getPrisma();
@@ -44,7 +48,7 @@ export const getSongAudioById = async (req: Request, res: Response) => {
 export const createSong = async (req: Request, res: Response) => {
   console.log("Uploading song..");
   try {
-    const { title, artist, duration } = req.body;
+    const { title, artist } = req.body;
     const file = req.file;
 
     if (!file) {
@@ -55,6 +59,9 @@ export const createSong = async (req: Request, res: Response) => {
     // Upload to storage
     const uploadResult = await uploadSongToCloudinary(file);
 
+    const formattedTitle = capitalizeWords(title);
+    const formattedArtist = capitalizeWords(artist);
+
     if (!uploadResult.success) {
       return res.status(500).json({ error: "Failed to upload song" });
     }
@@ -62,8 +69,8 @@ export const createSong = async (req: Request, res: Response) => {
     // Save song metadata + URL in DB
     const song = await prisma.song.create({
       data: {
-        title,
-        artist,
+        title: formattedTitle,
+        artist: formattedArtist,
         duration: durationInSeconds,
         path: uploadResult.url!,
         storage_id: uploadResult.public_id!,

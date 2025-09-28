@@ -20,3 +20,7 @@ export async function getAudioDuration(
   const metadata = await parseFile(file.path);
   return Math.floor(metadata.format.duration ?? 0);
 }
+
+export function capitalizeWords(str: string): string {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
