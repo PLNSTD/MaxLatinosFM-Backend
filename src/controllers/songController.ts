@@ -2,7 +2,10 @@
 import path from "path";
 import type { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import { deleteSongFromCloudinary, uploadSongToCloudinary } from "../services/cloudinaryService.js";
+import {
+  deleteSongFromCloudinary,
+  uploadSongToCloudinary,
+} from "../services/cloudinaryService.js";
 import { durationToSeconds, getAudioDuration } from "./utilities.js";
 import { radioQueue } from "../services/RadioManager.js";
 
@@ -80,25 +83,25 @@ export const updateSong = async (req: Request, res: Response) => {
 
 export const deleteSong = async (req: Request, res: Response) => {
   try {
-  const { id } = req.params;
-  const song = await prisma.song.findUnique({
-    where: { id: Number(id) },
-    select: { storage_id: true },
-  });
+    const { id } = req.params;
+    const song = await prisma.song.findUnique({
+      where: { id: Number(id) },
+      select: { storage_id: true },
+    });
 
-  if (!song) return res.json(404).json{error: "Song not found!"};
+    if (!song) return res.json(404).json({ error: "Song not found!" });
 
-  // Delete from cloudinary
-  if (song.storage_id) {
-    deleteSongFromCloudinary(song.storage_id);
+    // Delete from cloudinary
+    if (song.storage_id) {
+      deleteSongFromCloudinary(song.storage_id);
+    }
+
+    // Delete from DB
+    await prisma.song.delete({ where: { id: Number(id) } });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error("❌ Delete error", error);
+    return res.status(500).json({ error: "Failed to delete song" });
   }
-
-  // Delete from DB
-  await prisma.song.delete({ where: { id: Number(id) } });
-  
-  res.status(204).send();
-}catch (error) {
-  console.error("❌ Delete error", error);
-  return res.status(500).json({error: "Failed to delete song"});
-}
 };
