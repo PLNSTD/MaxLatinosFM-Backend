@@ -13,13 +13,13 @@ const prisma = radioQueue.getPrisma();
 
 export const getNowPlaying = async (req: Request, res: Response) => {
   const { song, elapsed } = radioQueue.getCurrentSong();
-  if (!song) res.json(404).json({ error: "Song not found!" });
-  res.json({ song, elapsed });
+  if (!song) return res.json(404).json({ error: "Song not found!" });
+  return res.json({ song, elapsed });
 };
 
 export const getAllSongs = async (req: Request, res: Response) => {
   const songs = await prisma.song.findMany();
-  res.json(songs);
+  return res.json(songs);
 };
 
 export const getSongById = async (songId: Number) => {
@@ -42,33 +42,40 @@ export const getSongAudioById = async (req: Request, res: Response) => {
 };
 
 export const createSong = async (req: Request, res: Response) => {
-  const { title, artist, duration } = req.body;
-  const file = req.file;
+  console.log("Uploading song..");
+  try {
+    const { title, artist, duration } = req.body;
+    const file = req.file;
 
-  if (!file) {
-    return res.status(400).json({ error: "No file uploaded" });
+    if (!file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+    const durationInSeconds = await getAudioDuration(file);
+
+    // Upload to storage
+    const uploadResult = await uploadSongToCloudinary(file);
+
+    if (!uploadResult.success) {
+      return res.status(500).json({ error: "Failed to upload song" });
+    }
+
+    // Save song metadata + URL in DB
+    const song = await prisma.song.create({
+      data: {
+        title,
+        artist,
+        duration: durationInSeconds,
+        path: uploadResult.url!,
+        storage_id: uploadResult.public_id!,
+      },
+    });
+
+    console.log("Success!");
+    return res.status(201).json(song);
+  } catch (error) {
+    console.error("❌ Delete error", error);
+    return res.status(500).json({ error: "Failed to create song" });
   }
-  const durationInSeconds = await getAudioDuration(file);
-
-  // Upload to storage
-  const uploadResult = await uploadSongToCloudinary(file);
-
-  if (!uploadResult.success) {
-    return res.status(500).json({ error: "Failed to upload song" });
-  }
-
-  // Save song metadata + URL in DB
-  const song = await prisma.song.create({
-    data: {
-      title,
-      artist,
-      duration: durationInSeconds,
-      path: uploadResult.url!,
-      storage_id: uploadResult.public_id!,
-    },
-  });
-
-  return res.status(201).json(song);
 };
 
 export const updateSong = async (req: Request, res: Response) => {
@@ -78,10 +85,11 @@ export const updateSong = async (req: Request, res: Response) => {
     where: { id: Number(id) },
     data: { title, artist, path, duration },
   });
-  res.json(song);
+  return res.json(song);
 };
 
 export const deleteSong = async (req: Request, res: Response) => {
+  console.log("Deleting song..");
   try {
     const { id } = req.params;
     const song = await prisma.song.findUnique({
@@ -98,8 +106,8 @@ export const deleteSong = async (req: Request, res: Response) => {
 
     // Delete from DB
     await prisma.song.delete({ where: { id: Number(id) } });
-
-    res.status(204).send();
+    console.log("Success!");
+    return res.status(204).send();
   } catch (error) {
     console.error("❌ Delete error", error);
     return res.status(500).json({ error: "Failed to delete song" });

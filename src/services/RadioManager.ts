@@ -41,6 +41,10 @@ class RadioQueue {
   }
 
   async tick() {
+    if (this.queue.length == 0) {
+      await this.randomizerQueue();
+      return;
+    }
     if (!this.currentSong) {
       this.updateCurrentSong();
       this.songStartTime = Date.now();
@@ -60,7 +64,7 @@ class RadioQueue {
 
   private async randomizerQueue(): Promise<number[]> {
     // 1️⃣ Fetch all song IDs from DB
-    const songs = await prisma.song.findMany({
+    let songs = await prisma.song.findMany({
       select: { id: true }, // only need IDs for the queue
     });
 
