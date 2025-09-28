@@ -18,7 +18,7 @@ const upload = multer({ dest: "uploads/" });
 songRouter.get("/now", getNowPlaying);
 
 // GET /api/songs -> get all songs
-songRouter.get("/", getAllSongs);
+songRouter.get("/list", getAllSongs);
 
 // GET /api/songs/:id -> get a song by ID
 songRouter.get("/:id", getSongById);
