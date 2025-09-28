@@ -46,9 +46,10 @@ class RadioQueue {
       this.songStartTime = Date.now();
     }
     if (!this.currentSong) return;
-    console.log(`Now Playing ID: ${this.queue[this.currentIndex]}`);
+
     if (this.getElapsed() >= this.currentSong!.duration) {
       this.currentIndex++;
+      console.log(`Now Playing ID: ${this.queue[this.currentIndex]}`);
       if (this.currentIndex >= this.queue.length) {
         this.queue = await this.randomizerQueue();
         this.currentIndex = 0;

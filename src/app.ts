@@ -9,6 +9,7 @@ const allowedOrigins = [
   "https://maxlatinosfm.com",
   "https://max-latinos-fm-plidhers-projects.vercel.app",
   "http://localhost:3000",
+  "https://max-latinos-70hgrik5l-plidhers-projects.vercel.app",
 ];
 
 // Allow requests from frontend

@@ -10,7 +10,6 @@ const prisma = radioQueue.getPrisma();
 
 export const getNowPlaying = async (req: Request, res: Response) => {
   const { song, elapsed } = radioQueue.getCurrentSong();
-  console.log(`${song?.id}`);
   if (!song) res.json(404).json({ error: "Song not found!" });
   res.json({ song, elapsed });
 };
