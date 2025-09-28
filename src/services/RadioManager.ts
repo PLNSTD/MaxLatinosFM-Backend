@@ -43,6 +43,7 @@ class RadioQueue {
   async tick() {
     if (!this.currentSong) {
       this.updateCurrentSong();
+      this.songStartTime = Date.now();
     }
     if (!this.currentSong) return;
     console.log(`Now Playing ID: ${this.queue[this.currentIndex]}`);
