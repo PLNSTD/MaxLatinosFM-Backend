@@ -1,5 +1,6 @@
 // EXPRESS ROUTES FOR items
 import { Router } from "express";
+import multer from "multer";
 import {
   getAllSongs,
   getSongById,
@@ -7,9 +8,14 @@ import {
   updateSong,
   deleteSong,
   getSongAudioById,
+  getNowPlaying,
 } from "../controllers/songController.js";
 
 export const songRouter = Router();
+const upload = multer({ dest: "uploads/" });
+
+// GET /api/songs/now -> getNowPlaying
+songRouter.get("/now", getNowPlaying);
 
 // GET /api/songs -> get all songs
 songRouter.get("/", getAllSongs);
@@ -18,10 +24,10 @@ songRouter.get("/", getAllSongs);
 songRouter.get("/:id", getSongById);
 
 // GET /api/songs/:id/audio -> get a song audio by ID
-songRouter.get("/:id/audio", getSongAudioById);
+// songRouter.get("/:id/audio", getSongAudioById);
 
-// POST /api/songs -> add a song by ID
-songRouter.post("/", createSong);
+// POST /api/upload -> add a song
+songRouter.post("/upload", upload.single("song"), createSong);
 
 // PUT /api/songs/:id -> update a song
 songRouter.put("/:id", updateSong);

@@ -1,13 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import app from "./app.js";
+import { radioQueue } from "./services/RadioManager.js";
 
 const PORT = process.env.PORT || 3001;
 
 const prisma = new PrismaClient();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+async function boostrap() {
+  await radioQueue.init();
+  setInterval(() => radioQueue.tick(), 5000); // check every 5s
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+boostrap();
 
 // Graceful shutdown
 process.on("SIGINT", async () => {

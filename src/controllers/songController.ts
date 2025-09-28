@@ -2,21 +2,30 @@
 import path from "path";
 import type { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
+import { uploadSongToCloudinary } from "../services/cloudinaryService.js";
+import { durationToSeconds, getAudioDuration } from "./utilities.js";
+import { radioQueue } from "../services/RadioManager.js";
 
-const prisma = new PrismaClient();
+const prisma = radioQueue.getPrisma();
+
+export const getNowPlaying = async (req: Request, res: Response) => {
+  const { song, elapsed } = radioQueue.getCurrentSong();
+  console.log(`${song?.id}`);
+  if (!song) res.json(404).json({ error: "Song not found!" });
+  res.json({ song, elapsed });
+};
 
 export const getAllSongs = async (req: Request, res: Response) => {
   const songs = await prisma.song.findMany();
   res.json(songs);
 };
 
-export const getSongById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const song = await prisma.song.findUnique({ where: { id: Number(id) } });
+export const getSongById = async (songId: Number) => {
+  const song = await prisma.song.findUnique({ where: { id: Number(songId) } });
 
-  if (!song) return res.status(404).json({ error: "Song not found" });
+  if (!song) return null;
 
-  res.json(song);
+  return song;
 };
 
 export const getSongAudioById = async (req: Request, res: Response) => {
@@ -31,11 +40,32 @@ export const getSongAudioById = async (req: Request, res: Response) => {
 };
 
 export const createSong = async (req: Request, res: Response) => {
-  const { title, artist, duration, path } = req.body;
+  const { title, artist, duration } = req.body;
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
+  const durationInSeconds = await getAudioDuration(file);
+
+  // Upload to storage
+  const uploadResult = await uploadSongToCloudinary(file);
+
+  if (!uploadResult.success) {
+    return res.status(500).json({ error: "Failed to upload song" });
+  }
+
+  // Save song metadata + URL in DB
   const song = await prisma.song.create({
-    data: { title, artist, duration, path },
+    data: {
+      title,
+      artist,
+      duration: durationInSeconds,
+      path: uploadResult.url!,
+    },
   });
-  res.status(201).json(song);
+
+  return res.status(201).json(song);
 };
 
 export const updateSong = async (req: Request, res: Response) => {
