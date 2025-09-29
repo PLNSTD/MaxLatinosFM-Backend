@@ -78,6 +78,7 @@ class RadioQueue {
       }
       if (this.bumperCnt % 3 == 0) {
         this.bumperCnt = 0;
+        this.currentIndex--;
         this.updateCurrentBumper();
       } else this.updateCurrentSong();
     }
