@@ -4,7 +4,7 @@ class RadioQueue {
   private songsQueue: number[] = [];
   private bumpersQueue: number[] = [];
   private currentIndex = 0;
-  private bumperCnt = 2;
+  private bumperCnt = 0;
   private songStartTime = Date.now();
   private prisma: PrismaClient;
   private currentSong: Song | null | Bumper;
