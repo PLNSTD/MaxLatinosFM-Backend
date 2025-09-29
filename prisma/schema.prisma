@@ -24,3 +24,14 @@ model Song {
   storage_id  String
   @@map("songs")
 }
+
+model Bumper {
+  id          Int     @id @default(autoincrement())
+  title       String
+  duration    Int
+  path        String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  storage_id  String
+  @@map("bumpers")
+}
