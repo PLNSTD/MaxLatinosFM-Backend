@@ -24,6 +24,10 @@ class RadioQueue {
     this.songStartTime = Date.now();
   }
 
+  clearQueue() {
+    this.songsQueue = [];
+  }
+
   private getElapsed(): number {
     return Math.floor((Date.now() - this.songStartTime) / 1000);
   }

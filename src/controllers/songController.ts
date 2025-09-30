@@ -114,6 +114,7 @@ export const deleteSong = async (req: Request, res: Response) => {
     // Delete from DB
     await prisma.song.delete({ where: { id: Number(id) } });
     console.log("Success!");
+    radioQueue.clearQueue();
     return res.status(204).send();
   } catch (error) {
     console.error("❌ Delete error", error);
