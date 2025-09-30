@@ -26,9 +26,10 @@ class RadioQueue {
 
   clearQueue() {
     this.songsQueue = [];
+    this.currentSong = null;
   }
 
-  private getElapsed(): number {
+  getElapsed(): number {
     return Math.floor((Date.now() - this.songStartTime) / 1000);
   }
 
@@ -36,6 +37,14 @@ class RadioQueue {
     const song = this.currentSong;
     const elapsed = this.getElapsed();
     return { song, elapsed };
+  }
+
+  async setCurrentSong(currentSongId: number) {
+    this.songsQueue = [currentSongId];
+    this.currentSong = await this.prisma.song.findUnique({
+      where: { id: currentSongId },
+    });
+    this.songStartTime = Date.now();
   }
 
   private async updateCurrentSong() {

@@ -26,6 +26,18 @@ export const getAllSongs = async (req: Request, res: Response) => {
   return res.json(songs);
 };
 
+export const setNowPlaying = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log(`Setting new song ID: ${id}`);
+  radioQueue.setCurrentSong(Number(id));
+  const elapsed = radioQueue.getElapsed();
+  const song = await prisma.song.findUnique({ where: { id: Number(id) } });
+
+  if (!song) return res.json(404).json({ error: "Song not found!" });
+
+  return res.json({ song, elapsed });
+};
+
 export const getSongById = async (songId: Number) => {
   const song = await prisma.song.findUnique({ where: { id: Number(songId) } });
 

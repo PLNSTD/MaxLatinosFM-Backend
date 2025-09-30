@@ -9,6 +9,7 @@ import {
   deleteSong,
   getSongAudioById,
   getNowPlaying,
+  setNowPlaying,
 } from "../controllers/songController.js";
 
 export const songRouter = Router();
@@ -21,7 +22,10 @@ songRouter.get("/now", getNowPlaying);
 songRouter.get("/list", getAllSongs);
 
 // GET /api/songs/:id -> get a song by ID
-songRouter.get("/:id", getSongById);
+// songRouter.get("/:id", getSongById);
+
+// GET /api/songs/:id -> set a song by ID
+songRouter.get("/:id", setNowPlaying);
 
 // GET /api/songs/:id/audio -> get a song audio by ID
 // songRouter.get("/:id/audio", getSongAudioById);
