@@ -98,13 +98,20 @@ export const createSong = async (req: Request, res: Response) => {
 };
 
 export const updateSong = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { title, artist, path, duration } = req.body;
-  const song = await prisma.song.update({
-    where: { id: Number(id) },
-    data: { title, artist, path, duration },
-  });
-  return res.json(song);
+  try {
+    const { id } = req.params;
+    const { title, artist, path } = req.body;
+
+    const song = await prisma.song.update({
+      where: { id: Number(id) },
+      data: { title, artist, path },
+    });
+
+    return res.json(song);
+  } catch (error) {
+    console.error("Update failed:", error);
+    return res.status(500).json({ error: "Failed to update song" });
+  }
 };
 
 export const deleteSong = async (req: Request, res: Response) => {
