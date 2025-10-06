@@ -3,11 +3,11 @@ import { Router } from "express";
 import multer from "multer";
 import {
   getAllSongs,
-  getSongById,
+  //getSongById,
   createSong,
   updateSong,
   deleteSong,
-  getSongAudioById,
+  //getSongAudioById,
   getNowPlaying,
   setNowPlaying,
 } from "../controllers/songController.js";
@@ -19,22 +19,22 @@ const upload = multer({ dest: "uploads/" });
 songRouter.get("/now", getNowPlaying);
 
 // GET /api/songs -> get all songs
-songRouter.get("/list", getAllSongs);
+songRouter.get("/admin/list", getAllSongs);
 
 // GET /api/songs/:id -> get a song by ID
 // songRouter.get("/:id", getSongById);
 
 // GET /api/songs/:id -> set a song by ID
-songRouter.get("/:id", setNowPlaying);
+songRouter.get("/admin/:id", setNowPlaying);
 
 // GET /api/songs/:id/audio -> get a song audio by ID
 // songRouter.get("/:id/audio", getSongAudioById);
 
 // POST /api/upload -> add a song
-songRouter.post("/upload", upload.single("song"), createSong);
+songRouter.post("/admin/upload", upload.single("song"), createSong);
 
 // PUT /api/songs/:id -> update a song
-songRouter.put("/:id", updateSong);
+songRouter.put("/admin/:id", updateSong);
 
 // DELETE /api/songs/:id -> delete a song
-songRouter.delete("/:id", deleteSong);
+songRouter.delete("/admin/:id", deleteSong);

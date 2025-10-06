@@ -22,42 +22,79 @@ export const getNowPlaying = async (req: Request, res: Response) => {
 };
 
 export const getAllSongs = async (req: Request, res: Response) => {
+  const cookieHeader = req.headers.cookie ?? "";
+  const isAdmin = cookieHeader.includes("admin_session=true");
+
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const songs = await prisma.song.findMany();
-  return res.json(songs);
+  return res.status(200).json(songs);
 };
 
 export const setNowPlaying = async (req: Request, res: Response) => {
+  // const cookieHeader = req.headers.cookie ?? "";
+  // const isAdmin = cookieHeader.includes("admin_session=true");
+
+  // if (!isAdmin) {
+  //   return new Response(JSON.stringify({ error: "Unauthorized" }), {
+  //     status: 401,
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  // }
+
   const { id } = req.params;
   console.log(`Setting new song ID: ${id}`);
   radioQueue.setCurrentSong(Number(id));
   const elapsed = radioQueue.getElapsed();
   const song = await prisma.song.findUnique({ where: { id: Number(id) } });
 
-  if (!song) return res.json(404).json({ error: "Song not found!" });
+  if (!song) return res.status(404).json({ error: "Song not found!" });
 
   return res.json({ song, elapsed });
 };
 
-export const getSongById = async (songId: Number) => {
-  const song = await prisma.song.findUnique({ where: { id: Number(songId) } });
+// export const getSongById = async (songId: Number) => {
 
-  if (!song) return null;
+//   const song = await prisma.song.findUnique({ where: { id: Number(songId) } });
 
-  return song;
-};
+//   if (!song) return null;
 
-export const getSongAudioById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const song = await prisma.song.findUnique({ where: { id: Number(id) } });
+//   return song;
+// };
 
-  if (!song) return res.status(404).send("Song not found");
+// export const getSongAudioById = async (
+//   req: NextApiRequest,
+//   res: NextApiResponse
+// ) => {
+//   const isAdmin = req.cookies.admin_session === "true";
+//   if (!isAdmin) return res.status(401).json({ error: "Unauthorized" });
 
-  res.header("Content-Type", "audio/mpeg");
-  console.log("Sending" + path.resolve(song.path));
-  res.sendFile(path.resolve(song.path));
-};
+//   const { id } = req.query;
+//   const song = await prisma.song.findUnique({ where: { id: Number(id) } });
+
+//   if (!song) return res.status(404).send("Song not found");
+
+//   res.header("Content-Type", "audio/mpeg");
+//   console.log("Sending" + path.resolve(song.path));
+//   res.sendFile(path.resolve(song.path));
+// };
 
 export const createSong = async (req: Request, res: Response) => {
+  const cookieHeader = req.headers.cookie ?? "";
+  const isAdmin = cookieHeader.includes("admin_session=true");
+
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   console.log("Uploading song..");
   try {
     const { title, artist } = req.body;
@@ -98,6 +135,16 @@ export const createSong = async (req: Request, res: Response) => {
 };
 
 export const updateSong = async (req: Request, res: Response) => {
+  const cookieHeader = req.headers.cookie ?? "";
+  const isAdmin = cookieHeader.includes("admin_session=true");
+
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const { id } = req.params;
     const { title, artist, path } = req.body;
@@ -115,6 +162,16 @@ export const updateSong = async (req: Request, res: Response) => {
 };
 
 export const deleteSong = async (req: Request, res: Response) => {
+  const cookieHeader = req.headers.cookie ?? "";
+  const isAdmin = cookieHeader.includes("admin_session=true");
+
+  if (!isAdmin) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   console.log("Deleting song..");
   try {
     const { id } = req.params;
@@ -123,7 +180,7 @@ export const deleteSong = async (req: Request, res: Response) => {
       select: { storage_id: true },
     });
 
-    if (!song) return res.json(404).json({ error: "Song not found!" });
+    if (!song) return res.status(404).json({ error: "Song not found!" });
 
     // Delete from cloudinary
     if (song.storage_id) {
@@ -134,7 +191,7 @@ export const deleteSong = async (req: Request, res: Response) => {
     await prisma.song.delete({ where: { id: Number(id) } });
     console.log("Success!");
     radioQueue.clearQueue();
-    return res.status(204).send();
+    return res.status(204).send("Success!");
   } catch (error) {
     console.error("❌ Delete error", error);
     return res.status(500).json({ error: "Failed to delete song" });

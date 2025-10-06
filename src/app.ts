@@ -3,6 +3,11 @@ import cors from "cors"; // CROSS-ORIGIN RESOURCE SHARING
 import type { Request, Response } from "express";
 import { songRouter } from "./routes/songRouter.js";
 import { bumperRouter } from "./routes/bumperRouter.js";
+import authRouter from "./routes/login.js";
+import authLogoutRouter from "./routes/logout.js";
+import cookieParser from "cookie-parser";
+import checkRouter from "./routes/check.js";
+import { adminAuth } from "./middlewares/adminAuth.js";
 
 const app = express();
 
@@ -23,14 +28,23 @@ app.use(
         callback(new Error("Not allowed by CORS"));
       }
     },
+    credentials: true, // allow cookies to be sent
   })
 );
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
+
+// adminAuthorization
+app.use("/songs/admin", adminAuth);
+app.use("/bumpers/admin", adminAuth);
 
 // Routes
 app.use("/songs", songRouter);
 app.use("/bumpers", bumperRouter);
+app.use("/auth/login", authRouter);
+app.use("/auth/login/check", checkRouter);
+app.use("/auth/logout", authLogoutRouter);
 
 export default app;
