@@ -18,9 +18,20 @@ authRouter.post("/", (req: Request, res: Response) => {
       secure: true,
       sameSite: "none",
       path: "/",
-      domain: ".maxlatinosfm.com",
+      // domain: ".maxlatinosfm.com",
       maxAge: 24 * 60 * 60 * 1000,
     });
+
+    // LOCALHOST ONLY
+    // Set HttpOnly cookie for admin session
+    /* const cookie = serialize("admin_session", "true", {
+      httpOnly: true,
+      secure: false, // HTTP on localhost
+      sameSite: "lax", // simpler for localhost
+      path: "/",
+      // no domain
+      maxAge: 24 * 60 * 60 * 1000,
+    }); */
 
     res.setHeader("Set-Cookie", cookie);
     return res.status(200).json({ success: true });
