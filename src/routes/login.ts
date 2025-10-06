@@ -15,8 +15,11 @@ authRouter.post("/", (req: Request, res: Response) => {
     // Set HttpOnly cookie for admin session
     const cookie = serialize("admin_session", "true", {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       path: "/",
-      maxAge: 60 * 60, // 1 hour
+      domain: ".maxlatinosfm.com",
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.setHeader("Set-Cookie", cookie);
